@@ -33,16 +33,36 @@ RawValues read_raw_values(char const * const name)
 typedef std::vector<size_t> DataIndexes;
 typedef RawValues Values;
 
-void remove_duplicates(const RawValues& raw, DataIndexes& indexes, Values & values)
+void remove_duplicates(const RawValues& raw, DataIndexes& indexes, Values & values, size_t & collisions)
 {
-  int table[raw.size()];
+  const size_t size = raw.size() * 2;
+  int table[size];
   std::memset(table, -1, sizeof(table));
-  std::cout << "size_of: " << sizeof(table) << std::endl;
 
   for (size_t i = 0; i<raw.size(); ++i) {
     const Value& v = raw[i];
 
-    size_t hash = boost::hash_range(v.begin(), v.end());
+    size_t hash = boost::hash_range(v.begin(), v.end()) % size;
+    
+    for (size_t j = 0; ; ++j) {
+      size_t idx = (hash + j) % size;
+      if (table[idx] == -1) {
+        values.push_back(v);
+        indexes.push_back(values.size() - 1);
+        table[idx] = values.size() - 1;
+        break;
+      }
+      else if (values[table[idx]] == raw[i]) {
+    //    std::cout << "found duplicate!" << std::endl;
+        indexes.push_back(table[idx]);
+        break;
+      }
+      else {
+    //    std::cout << "found collison" << std::endl;
+        ++collisions;
+      }
+      assert(j < raw.size());
+    }
   }
 
 }
@@ -54,7 +74,12 @@ int main()
 
   DataIndexes indexes;
   Values values;
-  remove_duplicates(vals, indexes, values);
+  size_t collisions = 0;
+  remove_duplicates(vals, indexes, values, collisions);
+
+  std::cout << "unque_size: " << values.size() << " collisions: " << collisions << std::endl;
+
+  std::cout << "unque_size: " << values.size() << std::endl;
 
   return 0;
 }
