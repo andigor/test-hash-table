@@ -67,6 +67,25 @@ void remove_duplicates(const RawValues& raw, DataIndexes& indexes, Values & valu
 
 }
 
+
+
+void check(const RawValues& raw, const DataIndexes& indexes, const Values& vals)
+{
+  for (size_t i = 0; i<raw.size(); i++) {
+    if ( raw[i] != vals[indexes[i]]  ) {
+      std::cout << "ERRRROR: " << i << " raw: " 
+        << raw[i][0] << " " 
+        << raw[i][1] << " " 
+        << raw[i][2] 
+        <<  " vals: "
+        << vals[ indexes[i] ][0] << " "
+        << vals[ indexes[i] ][1] << " "
+        << vals[ indexes[i] ][2] 
+        << std::endl;
+    }
+  }
+}
+
 int main()
 {
   RawValues vals = read_raw_values("data");
@@ -79,7 +98,7 @@ int main()
 
   std::cout << "unque_size: " << values.size() << " collisions: " << collisions << std::endl;
 
-  std::cout << "unque_size: " << values.size() << std::endl;
+  check(vals, indexes, values);
 
   return 0;
 }
