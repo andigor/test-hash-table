@@ -1,0 +1,6 @@
+#!/bin/bash
+
+
+for f in $(seq 1 10000); do
+  echo $(shuf -i 0-100 -n3 | sort -g | tr '\n' ' ' ) 
+done
